@@ -16,8 +16,22 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    backgroundColor: "#fffbf2",
   },
   paper: {
+    padding: theme.spacing(5),
+    textAlign: "center",
+    color: theme.palette.text.secondary,
+    margin: theme.spacing(2),
+    "&:hover": {
+      backgroundColor: "#dedede",
+      color: "white",
+      "& .MuiListItemIcon-root": {
+        color: "white"
+      }
+    },
+  },
+  boxpaper: {
     padding: theme.spacing(5),
     textAlign: "center",
     color: theme.palette.text.secondary,
@@ -95,7 +109,7 @@ return(
               <Avatar src={hourly.hour[index].condition.icon}/>
               <h3>Time: {hourly.hour[index].time}</h3>
               <div>
-                <p>Temperature: {hourly.hour[index].temp}</p>
+                <p>Temperature: {hourly.hour[index].temp_c}</p>
                 <p>Humidity: {hourly.hour[index].humidity}</p>
                 <p>Wind: {hourly.hour[index].wind_mph}</p>
               </div> 
@@ -120,8 +134,8 @@ return(
               <Avatar src={weather.forecast.forecastday[index].day.condition.icon}/>
               <h3>Date: {weather.forecast.forecastday[index].date}</h3>
               <div>
-                <p>👨: Temperature: {weather.forecast.forecastday[index].day.avgtemp_c}</p>
-                <p>📖: Humidity: {weather.forecast.forecastday[index].day.avghumidity}</p>
+                <p>Temperature: {weather.forecast.forecastday[index].day.avgtemp_c}</p>
+                <p>Humidity: {weather.forecast.forecastday[index].day.avghumidity}</p>
               </div> </Paper>
             </div>
           );
@@ -133,12 +147,12 @@ return(
     <div className={classes.root}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Paper className={classes.paper}>
+          <Paper className={classes.boxpaper}>
             <Typography> Weather Forecast</Typography>
           </Paper>
         </Grid>
         <Grid item xs={4}>
-          <Paper className={classes.paper}>
+          <Paper className={classes.boxpaper}>
             <Typography> Enter the city for a forecast:</Typography>
             <TextField
               className={classes.field}
@@ -160,7 +174,7 @@ return(
           {/* <Typography> {location}</Typography> */}
         </Grid>
         <Grid item xs={4}>
-          <Paper className={classes.paper}>
+          <Paper className={classes.boxpaper}>
                 <div>
                   {weather &&
                     Object.keys(array).map((key, index) => {
@@ -184,7 +198,7 @@ return(
           </Paper>
         </Grid>
         <Grid item xs={4}>
-          <Paper className={classes.paper}>
+          <Paper className={classes.boxpaper}>
           {/* {weather ? console.log(weather.forecast): ''}  */}
           
           <div>
