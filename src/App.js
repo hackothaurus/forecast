@@ -6,11 +6,12 @@ import Typography from "@material-ui/core/Typography";
 import Axios from "axios";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import List from "@material-ui/core/List";
-import ReactDOM from "react-dom";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
+import Avatar from '@material-ui/core/Avatar';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(5),
     textAlign: "center",
     color: theme.palette.text.secondary,
-    margin: theme.spacing(1),
+    margin: theme.spacing(2),
   },
   field: {
     margin: theme.spacing(5),
@@ -37,6 +38,8 @@ export default function CenteredGrid() {
   const [weather, setWeather] = useState(null);
   const [timeZone, setTimeZone] = useState({});
   const [location, setLocation] = useState("");
+  const [open, setOpen] = React.useState(false);
+  const [hourly, setHourly] = React.useState(null);
 
   const [current, setCurrent] = useState(null);
   const [forecast, setForecast] = useState(null);
@@ -57,8 +60,6 @@ export default function CenteredGrid() {
     })
       .then((res) => {
         setWeather(res.data);
-        setCurrent({ current: weather.current });
-        setForecast({ forecast: weather.forecast });
       })
       .catch((err) => {
         if (typeof(err) == 'undefined' && err.response.status === 400){
@@ -77,19 +78,51 @@ export default function CenteredGrid() {
     return () => clearInterval(id);
   }, []);
 
+  const hourForecast = (data) => {
+    setHourly(data)
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const dialogData = (object) =>{
+return(
+           (hourly.hour).map((key, index) => {
+          return (          
+            <div key={index}>
+              <Avatar src={hourly.hour[index].condition.icon}/>
+              <h3>Time: {hourly.hour[index].time}</h3>
+              <div>
+                <p>Temperature: {hourly.hour[index].temp}</p>
+                <p>Humidity: {hourly.hour[index].humidity}</p>
+                <p>Wind: {hourly.hour[index].wind_mph}</p>
+              </div> 
+            </div>
+          );
+  })
+)
+}
+
   const returnForecast = () => {
     const array = [0]
       return(
+        // weather.map((item)=>{console.log(item)})
         Object.keys(weather.forecast.forecastday).map((key, index) => {
+          // console.log(weather.forecast.forecastday)
           return (
+            
             <div key={index}>
-              <h3>Next Ten Days</h3>
-              <h2>{weather.forecast.forecastday.date}</h2>
+              <Paper className={classes.paper} onClick={()=>hourForecast(weather.forecast.forecastday[index])}>
 
+             
+              <Avatar src={weather.forecast.forecastday[index].day.condition.icon}/>
+              <h3>Date: {weather.forecast.forecastday[index].date}</h3>
               <div>
-                <p>👨: Temperature: {weather.forecast.forecastday.day.avgtemp_c}</p>
-                <p>📖: Humidity: {weather.forecast.forecastday.day.avghumidity}</p>
-              </div>
+                <p>👨: Temperature: {weather.forecast.forecastday[index].day.avgtemp_c}</p>
+                <p>📖: Humidity: {weather.forecast.forecastday[index].day.avghumidity}</p>
+              </div> </Paper>
             </div>
           );
         })
@@ -132,14 +165,15 @@ export default function CenteredGrid() {
                   {weather &&
                     Object.keys(array).map((key, index) => {
                       return (
-                        <div key={index}>
+                        <div key={index} align='center'>
                           <h3>Current Weather</h3>
                           <h2>{weather.location.name}</h2>
-
+                          <Avatar src={weather.current.condition.icon} />
                           <div>
-                            <p>👨: Temperature: {weather.current.temp_c}</p>
-                            <p>📖: Humidity: {weather.current.humidity}</p>
-                            <p>📖: Wind: {weather.current.wind_mph}</p>
+                          
+                            <p>Temperature: {weather.current.temp_c}</p>
+                            <p>Humidity: {weather.current.humidity}</p>
+                            <p>Wind: {weather.current.wind_mph}</p>
                           </div>
                         </div>
                       );
@@ -151,12 +185,34 @@ export default function CenteredGrid() {
         </Grid>
         <Grid item xs={4}>
           <Paper className={classes.paper}>
+          {/* {weather ? console.log(weather.forecast): ''}  */}
+          
           <div>
                   {weather ? returnForecast(): ''}
                 </div>
           </Paper>
         </Grid>
       </Grid>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {hourly ? dialogData() : null}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary" autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 }
