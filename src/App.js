@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(5),
     textAlign: "center",
     color: theme.palette.text.secondary,
+    margin: theme.spacing(1),
   },
   field: {
     margin: theme.spacing(5),
@@ -55,13 +56,13 @@ export default function CenteredGrid() {
       timeout: 10000,
     })
       .then((res) => {
-        //console.log(res.data);
         setWeather(res.data);
         setCurrent({ current: weather.current });
         setForecast({ forecast: weather.forecast });
       })
       .catch((err) => {
-        alert(err);
+        if (typeof(err) == 'undefined' && err.response.status === 400){
+        alert("Invalid input. Please write the correct name of the city");}
       });
   };
 
@@ -75,6 +76,25 @@ export default function CenteredGrid() {
     const id = setInterval(apiCall, 50000);
     return () => clearInterval(id);
   }, []);
+
+  const returnForecast = () => {
+    const array = [0]
+      return(
+        Object.keys(weather.forecast.forecastday).map((key, index) => {
+          return (
+            <div key={index}>
+              <h3>Next Ten Days</h3>
+              <h2>{weather.forecast.forecastday.date}</h2>
+
+              <div>
+                <p>👨: Temperature: {weather.forecast.forecastday.day.avgtemp_c}</p>
+                <p>📖: Humidity: {weather.forecast.forecastday.day.avghumidity}</p>
+              </div>
+            </div>
+          );
+        })
+      )
+  }
 
   return (
     <div className={classes.root}>
@@ -95,12 +115,7 @@ export default function CenteredGrid() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
-          </Paper>
-          {/* <Typography> {location}</Typography> */}
-        </Grid>
-        <Grid item xs={4}>
-          <Paper className={classes.paper}>
-            <Button
+             <Button
               variant="contained"
               color="primary"
               className={classes.field}
@@ -109,15 +124,10 @@ export default function CenteredGrid() {
               Get weather forecast
             </Button>
           </Paper>
+          {/* <Typography> {location}</Typography> */}
         </Grid>
-        <Grid item xs={12} md={12}>
-          <Paper className={classes.list}>
-            <List
-              component="nav"
-              className={classes.root}
-              aria-label="mailbox folders"
-            >
-              <ListItem>
+        <Grid item xs={4}>
+          <Paper className={classes.paper}>
                 <div>
                   {weather &&
                     Object.keys(array).map((key, index) => {
@@ -135,26 +145,15 @@ export default function CenteredGrid() {
                       );
                     })}
                 </div>
-              </ListItem>
-              <ListItem>
-                <div>
-                  {forecast &&
-                    Object.keys(forecast.forecastday).map((key, index) => {
-                      return (
-                        <div key={index}>
-                          <h3>Next Ten Days</h3>
-                          <h2>{forecast.forecastday.date}</h2>
+                
 
-                          <div>
-                            <p>👨: Temperature: {forecast.forecastday.day.avgtemp_c}</p>
-                            <p>📖: Humidity: {forecast.forecastday.day.avghumidity}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
+          </Paper>
+        </Grid>
+        <Grid item xs={4}>
+          <Paper className={classes.paper}>
+          <div>
+                  {weather ? returnForecast(): ''}
                 </div>
-              </ListItem>
-            </List>
           </Paper>
         </Grid>
       </Grid>
